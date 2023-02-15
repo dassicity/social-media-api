@@ -10,8 +10,10 @@ router.get('/getPosts', feedController.getPosts);
 
 // POST /feed/createPost - create a post with user entered content
 router.post('/createPost', [
-    body('title').trim().isLength({ min: 7 }),
+    body('title').trim().isLength({ min: 5 }),
     body('content').trim().isLength({ min: 10 })
 ], feedController.createPost);
 
 module.exports = router;
+
+// /media/soumyanil/New Volume/social-media-api

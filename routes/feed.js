@@ -14,6 +14,8 @@ router.post('/createPost', [
     body('content').trim().isLength({ min: 10 })
 ], feedController.createPost);
 
+router.get('/getPost/:postId', feedController.getPost);
+
 module.exports = router;
 
 // /media/soumyanil/New Volume/social-media-api

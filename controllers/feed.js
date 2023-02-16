@@ -2,18 +2,19 @@ const { validationResult } = require('express-validator');
 const Post = require('../models/post');
 
 exports.getPosts = (req, res, next) => {
-    res.status(200).json({
-        "posts": [{
-            _id: '1',
-            title: 'First Post',
-            content: 'This is my hello world post!',
-            imageUrl: 'images/jets.JPEG',
-            creator: {
-                name: 'Soumyanil Das'
-            },
-            createdAt: new Date()
-        }]
-    });
+    Post.find()
+        .then(posts => {
+            res.status(200).json({
+                message: 'Posts fetched successfully',
+                posts: posts
+            })
+        })
+        .catch(err => {
+            if (!error.statusCode) {
+                error.statusCode = 500;
+            }
+            next(error);
+        });
 }
 
 exports.createPost = (req, res, next) => {
@@ -28,8 +29,18 @@ exports.createPost = (req, res, next) => {
         // });
 
     }
+    if (!req.file) {
+        const error = new Error('Image file not found.');
+        error.statusCode = 422;
+        throw error;
+    }
+
+
     const title = req.body.title;
     const content = req.body.content;
+    const imageUrl = req.file.path;
+    // console.log('In Create Post');
+    // console.log(imageUrl);
 
     const post = new Post({
         title: title,
@@ -37,7 +48,7 @@ exports.createPost = (req, res, next) => {
         creator: {
             name: 'Soumyanil'
         },
-        imageUrl: 'images/jets.JPEG'
+        imageUrl: imageUrl
     });
 
     post.save()
@@ -55,4 +66,27 @@ exports.createPost = (req, res, next) => {
             next(err);
         })
 
+}
+
+exports.getPost = (req, res, next) => {
+    const postId = req.params.postId;
+    Post.findById(postId)
+        .then(post => {
+            if (!post) {
+                const error = new Error('No post was found!');
+                error.statusCode = 404;
+                throw error;
+            }
+
+            res.status(200).json({
+                message: 'Post fetched successfully!',
+                post: post
+            })
+        })
+        .catch(error => {
+            if (!error.statusCode) {
+                error.statusCode = 500;
+            }
+            next(error);
+        })
 }

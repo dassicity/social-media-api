@@ -6,19 +6,30 @@ const Path = require('path');
 const Post = require('../models/post');
 
 exports.getPosts = (req, res, next) => {
+    const currentPage = req.query.page || 1;
+    let totalItems;
+    const perPage = 2;
     Post.find()
+        .countDocuments()
+        .then(items => {
+            totalItems = items;
+            return Post.find()
+                .skip((currentPage - 1) * perPage)
+                .limit(perPage);
+        })
         .then(posts => {
             res.status(200).json({
                 message: 'Posts fetched successfully',
-                posts: posts
+                posts: posts,
+                totalItems: totalItems
             })
         })
-        .catch(err => {
+        .catch(error => {
             if (!error.statusCode) {
                 error.statusCode = 500;
             }
             next(error);
-        });
+        })
 }
 
 exports.createPost = (req, res, next) => {
@@ -96,6 +107,17 @@ exports.getPost = (req, res, next) => {
 }
 
 exports.editPost = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Creation of post failed due to wrongly entered data');
+        error.statusCode = 422;
+        throw error;
+        // return res.status(422).json({
+        //     message: "Creation of post failed due to wrongly entered data",
+        //     errors: errors
+        // });
+
+    }
     const postId = req.params.postId;
     const title = req.body.title;
     const content = req.body.content;

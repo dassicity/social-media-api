@@ -6,6 +6,10 @@ const multer = require('multer');
 
 const app = express();
 
+const feedRouter = require('./routes/feed');
+const authRouter = require('./routes/auth');
+
+
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         // console.log("In destination");
@@ -26,7 +30,6 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
-const feedRouter = require('./routes/feed');
 
 app.use(bodyparser.json());     // We wouldn't use urlencoded here because we are only gonna deal with json data both with req and res
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
@@ -40,14 +43,15 @@ app.use((req, res, next) => {
 })
 
 app.use('/feed', feedRouter);
+app.use('/auth', authRouter);
 
 
 app.use((error, req, res, next) => {
     console.log(error);
     const status = error.statusCode || 500;
     const message = error.message;
-
-    res.status(status).json({ message: message });
+    const data = error.data;
+    res.status(status).json({ message: message, data: data });
 })
 
 mongoose.connect('mongodb+srv://dassic:Dassic007@cluster0.ad9yl.mongodb.net/feed')

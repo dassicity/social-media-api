@@ -17,7 +17,7 @@ router.post('/createPost', isAuth, [
 
 router.get('/getPost/:postId', isAuth, feedController.getPost);
 
-router.put('/post/:postId', [
+router.put('/post/:postId', isAuth, [
     body('title').trim().isLength({ min: 5 }),
     body('content').trim().isLength({ min: 10 })
 ], feedController.editPost);

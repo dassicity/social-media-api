@@ -37,7 +37,7 @@ app.use('/images', express.static(Path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type , Authorization');
     next();
 })
@@ -56,7 +56,13 @@ app.use((error, req, res, next) => {
 
 mongoose.connect('mongodb+srv://dassic:Dassic007@cluster0.ad9yl.mongodb.net/feed')
     .then(res => {
-        console.log("Connected to DB");
-        app.listen(8080);
+        const server = app.listen(8080);
+        if (server) {
+            console.log("Connected to DB");
+        }
+        // const io = require('socket.io')(server);
+        // io.on('connection', socket => {
+        //     console.log("Connected to socket!");
+        // })
     })
     .catch(err => console.log(err))

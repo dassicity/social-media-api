@@ -118,23 +118,14 @@ exports.getPost = (req, res, next) => {
 }
 
 exports.editPost = (req, res, next) => {
+    const postId = req.params.postId;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const error = new Error('Creation of post failed due to wrongly entered data');
         error.statusCode = 422;
         throw error;
-        // return res.status(422).json({
-        //     message: "Creation of post failed due to wrongly entered data",
-        //     errors: errors
-        // });
+    }
 
-    }
-    if (post.creator.toStrng() !== req.userId) {
-        const error = new Error('Not authorized!');
-        error.statusCode = 403;
-        throw error;
-    }
-    const postId = req.params.postId;
     const title = req.body.title;
     const content = req.body.content;
     let imageUrl = req.body.image;
@@ -148,12 +139,19 @@ exports.editPost = (req, res, next) => {
         error.statusCode = 422;
         throw error;
     }
+    console.log(req.userId);
 
     Post.findById(postId)
         .then(post => {
             if (!post) {
                 const error = new Error('No post was found!');
                 error.statusCode = 404;
+                throw error;
+            }
+            // console.log(req.userId);
+            if (post.creator.toString() !== req.userId) {
+                const error = new Error('Not authorized!');
+                error.statusCode = 403;
                 throw error;
             }
             if (imageUrl !== post.imageUrl) {
@@ -180,6 +178,7 @@ exports.editPost = (req, res, next) => {
 
 exports.deletePost = (req, res, next) => {
     const postId = req.params.postId;
+    console.log(req.userId);
 
     Post.findById(postId)
         .then(post => {
@@ -189,7 +188,7 @@ exports.deletePost = (req, res, next) => {
                 throw error;
             }
             // Check if the logged in user created the post
-            if (post.creator.toStrng() !== req.userId) {
+            if (post.creator.toString() !== req.userId) {
                 const error = new Error('Not authorized!');
                 error.statusCode = 403;
                 throw error;

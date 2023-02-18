@@ -7,7 +7,7 @@ const isAuth = require('../middleware/is-auth');
 const router = express.Router();
 
 // GET /feed/getposts - Get all the posts to render in the field
-router.get('/getPosts', isAuth, feedController.getPosts);
+router.get('/getPosts', feedController.getPosts);
 
 // POST /feed/createPost - create a post with user entered content
 router.post('/createPost', isAuth, [
